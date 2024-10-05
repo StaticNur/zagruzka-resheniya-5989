@@ -9,7 +9,7 @@ export function HomePage () {
 
   const titleElement = userRole === 'admin' ? 
     <>
-      Список всех доступных фильтров
+      Список всех доступных продуктов
       <AddCircleOutline style={{ 
         color: '#B0B0B0',
         marginLeft: '14px'

@@ -1,16 +1,18 @@
-import { Search } from "@mui/icons-material";
-import { Box, InputBase } from "@mui/material";
+import { Add, Search } from "@mui/icons-material";
+import { Box, Button, InputBase, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import axios from "../axios"
 import { Product } from "../types";
+import { ProductCard } from "./ProductCard";
+import { Link } from "react-router-dom";
 
 export function ProductList () {
   const [products, setProducts] = useState<Product[]>([]) 
 
   useEffect(() => {
     async function fetchProductList () {
-      const data = axios.get('/api/products/all')
-      // setProducts(data)
+      const { data } = await axios.get<Product[]>('/api/products/all')
+      setProducts(data)
     }
     fetchProductList()
   }, [])
@@ -41,7 +43,29 @@ export function ProductList () {
         flexDirection: 'column',
         gap: '16px'
       }}>
-
+        {products.length > 0 ? 
+          products.map((product) => <ProductCard key={product.id} {...product}  />)
+          :
+          <>
+            <Typography align="center" fontSize={24} component="p">
+              Список доступных продуктов пуст. Добавьте хотя бы 1 продукт.
+            </Typography>
+            <Link to="/create-product">
+              <Button sx={{
+                display: 'flex',
+                alignItems: 'center',
+                borderRadius: '12px',
+                padding: '9px 12px',
+                // maxWidth: '140px',
+                fontSize: '14px',
+                textTransform: 'inherit'
+              }} variant="contained" fullWidth >
+                <Add />
+                Создать продукт
+              </Button>
+            </Link>
+          </>
+        }
       </Box>
     </Box>
   )
