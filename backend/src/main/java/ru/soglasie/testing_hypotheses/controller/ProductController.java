@@ -7,10 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.soglasie.testing_hypotheses.dto.ParameterDto;
 import ru.soglasie.testing_hypotheses.dto.ProductDto;
 import ru.soglasie.testing_hypotheses.model.entity.Product;
-import ru.soglasie.testing_hypotheses.repository.ProductRepository;
+import ru.soglasie.testing_hypotheses.service.ProductService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -18,11 +17,11 @@ import java.util.stream.Collectors;
 public class ProductController {
 
     @Autowired
-    private ProductRepository productRepository;
+    private ProductService productService;
 
     @GetMapping("/all")
     public ResponseEntity<List<ProductDto>> getAllProducts() {
-        List<Product> products = productRepository.findAll();
+        List<Product> products = productService.getAllProducts();
         List<ProductDto> productDTOs = products.stream()
                 .map(ProductDto::new)
                 .collect(Collectors.toList());
@@ -31,79 +30,43 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<ProductDto>> getProductsByCategories(@RequestParam("category") List<String> categoryParam) {
-        List<Product> products = productRepository.findByCategory_NameIn(categoryParam);
-
-        if (!products.isEmpty()) {
-            List<ProductDto> productDtos = products.stream()
-                    .map(ProductDto::new)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(productDtos);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(productService.getProductsByCategories(categoryParam));
     }
 
-    @GetMapping("/search") // Путь для поиска
+    @GetMapping("/search")
     public ResponseEntity<List<ProductDto>> searchProductsByName(@RequestParam("name") String name) {
-        List<Product> products = productRepository.findByNameContainingIgnoreCase(name);
-
-        if (!products.isEmpty()) {
-            List<ProductDto> productDtos = products.stream()
-                    .map(ProductDto::new)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(productDtos);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(productService.searchProductsByName(name));
     }
-    @GetMapping("/{id}/parameters") // Путь для поиска
+
+    @GetMapping("/{id}/parameters")
     public ResponseEntity<List<ParameterDto>> getAllParameterThisProduct(@PathVariable Long id) {
-        Optional<Product> product = productRepository.findById(id);
-        if(product.isPresent()){
-            List<ParameterDto> productDto = product.get()
-                    .getParameters().stream()
-                    .map(ParameterDto::new)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(productDto);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(productService.getAllParameterThisProduct(id));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
-        Optional<Product> product = productRepository.findById(id);
-        if(product.isPresent()){
-            ProductDto productDto = new ProductDto(product.get());
-            return ResponseEntity.ok(productDto);
-        }
-        return ResponseEntity.notFound().build();
+        return productService.getProductById(id)
+                .map(product -> ResponseEntity.ok(new ProductDto(product)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        Product savedProduct = productRepository.save(product);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(productService.createProduct(product));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
-        return productRepository.findById(id)
-                .map(product -> {
-                    product.setName(productDetails.getName());
-                    product.setCategory(productDetails.getCategory());
-                    //product.setLineOfBusiness(productDetails.getLineOfBusiness());
-                    //product.setRisks(productDetails.getRisks());
-                    return ResponseEntity.ok(productRepository.save(product));
-                })
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(productService.updateProduct(id, productDetails));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
-        return productRepository.findById(id)
-                .map(product -> {
-                    productRepository.delete(product);
-                    return ResponseEntity.ok().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        return productService.deleteProduct(id)
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.notFound().build();
     }
 }
 

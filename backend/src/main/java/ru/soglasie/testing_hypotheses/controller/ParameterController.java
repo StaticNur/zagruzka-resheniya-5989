@@ -5,10 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.soglasie.testing_hypotheses.dto.ParameterDto;
-import ru.soglasie.testing_hypotheses.dto.ProductDto;
 import ru.soglasie.testing_hypotheses.model.entity.Parameter;
-import ru.soglasie.testing_hypotheses.model.entity.Product;
-import ru.soglasie.testing_hypotheses.repository.ParameterRepository;
+import ru.soglasie.testing_hypotheses.service.ParameterService;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,11 +16,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/parameters")
 public class ParameterController {
     @Autowired
-    private ParameterRepository parameterRepository;
+    private ParameterService parameterService;
 
     @GetMapping
     public ResponseEntity<List<ParameterDto>> getAllParameters() {
-        List<Parameter> parameters = parameterRepository.findAll();
+        List<Parameter> parameters = parameterService.getAllParameters();
         List<ParameterDto> parameterDTOs = parameters.stream()
                 .map(ParameterDto::new)
                 .collect(Collectors.toList());
@@ -31,14 +29,15 @@ public class ParameterController {
 
     @PostMapping
     public ResponseEntity<Parameter> createParameter(@RequestBody Parameter parameter) {
-        Parameter savedParameter = parameterRepository.save(parameter);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedParameter);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(parameterService.createParameter(parameter));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ParameterDto> getParameterById(@PathVariable Long id) {
-        Optional<Parameter> parameter = parameterRepository.findById(id);
-        if(parameter.isPresent()){
+        Optional<Parameter> parameter = parameterService.getParameterById(id);
+        if (parameter.isPresent()) {
             ParameterDto parameterDto = new ParameterDto(parameter.get());
             return ResponseEntity.ok(parameterDto);
         }

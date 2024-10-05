@@ -31,16 +31,11 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    // Связь многие ко многим с промежуточной таблицей "product_parameters"
     @ManyToMany
     @JoinTable(
-            name = "product_parameters", // название промежуточной таблицы
-            joinColumns = @JoinColumn(name = "product_id"), // внешний ключ на сущность Product
-            inverseJoinColumns = @JoinColumn(name = "parameter_id") // внешний ключ на сущность Parameter
+            name = "product_parameters",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "parameter_id")
     )
     private List<Parameter> parameters;
 }
-
-//    @OneToMany
-//    @JoinColumn(name = "product_id")
-//    private List<Risk> risks;

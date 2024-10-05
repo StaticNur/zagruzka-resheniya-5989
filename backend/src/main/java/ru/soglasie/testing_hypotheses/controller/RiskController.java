@@ -1,10 +1,11 @@
 package ru.soglasie.testing_hypotheses.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.soglasie.testing_hypotheses.model.entity.Risk;
-import ru.soglasie.testing_hypotheses.repository.RiskRepository;
+import ru.soglasie.testing_hypotheses.service.RiskService;
 
 import java.util.List;
 
@@ -13,42 +14,36 @@ import java.util.List;
 public class RiskController {
 
     @Autowired
-    private RiskRepository riskRepository;
+    private RiskService riskService;
 
     @GetMapping
-    public List<Risk> getAllRisks() {
-        return riskRepository.findAll();
+    public ResponseEntity<List<Risk>> getAllRisks() {
+        return ResponseEntity.ok(riskService.getAllRisks());
     }
 
     @PostMapping
-    public Risk createRisk(@RequestBody Risk risk) {
-        return riskRepository.save(risk);
+    public ResponseEntity<Risk> createRisk(@RequestBody Risk risk) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(riskService.createRisk(risk));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Risk> getRiskById(@PathVariable Long id) {
-        return riskRepository.findById(id)
+        return riskService.getRiskById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Risk> updateRisk(@PathVariable Long id, @RequestBody Risk riskDetails) {
-        return riskRepository.findById(id)
-                .map(risk -> {
-                    risk.setName(riskDetails.getName());
-                    return ResponseEntity.ok(riskRepository.save(risk));
-                })
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(riskService.updateRisk(id, riskDetails));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRisk(@PathVariable Long id) {
-        return riskRepository.findById(id)
-                .map(risk -> {
-                    riskRepository.delete(risk);
-                    return ResponseEntity.ok().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        return riskService.deleteRisk(id)
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.notFound().build();
     }
 }

@@ -6,10 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.soglasie.testing_hypotheses.model.entity.Category;
 import ru.soglasie.testing_hypotheses.dto.CategoryDto;
-import ru.soglasie.testing_hypotheses.repository.CategoryRepository;
+import ru.soglasie.testing_hypotheses.service.CategoryService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -17,31 +16,26 @@ import java.util.stream.Collectors;
 public class CategoryController {
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private CategoryService categoryService;
 
     @GetMapping
     public ResponseEntity<List<CategoryDto>> getAllCategories() {
-        List<Category> category = categoryRepository.findAll();
-        List<CategoryDto> categoryDtos = category.stream()
+        List<Category> category = categoryService.getAllCategories();
+        return ResponseEntity.ok(category.stream()
                 .map(CategoryDto::new)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(categoryDtos);
+                .collect(Collectors.toList()));
     }
-
 
     @PostMapping
     public ResponseEntity<Category> createCategory(@RequestBody Category category) {
-        Category savedParameter = categoryRepository.save(category);
+        Category savedParameter = categoryService.createCategory(category);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedParameter);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryDto> getCategoryById(@PathVariable Long id) {
-        Optional<Category> parameter = categoryRepository.findById(id);
-        if (parameter.isPresent()) {
-            CategoryDto parameterDto = new CategoryDto(parameter.get());
-            return ResponseEntity.ok(parameterDto);
-        }
-        return ResponseEntity.notFound().build();
+        return categoryService.getCategoryById(id)
+                .map(category -> ResponseEntity.ok(new CategoryDto(category)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

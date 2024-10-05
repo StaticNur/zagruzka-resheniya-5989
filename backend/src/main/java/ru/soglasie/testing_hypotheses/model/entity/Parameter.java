@@ -43,7 +43,6 @@ public class Parameter {
     @Column
     private Boolean checking;
 
-    // Двусторонняя связь многие ко многим
     @ManyToMany(mappedBy = "parameters")
     private List<Product> products;
 }

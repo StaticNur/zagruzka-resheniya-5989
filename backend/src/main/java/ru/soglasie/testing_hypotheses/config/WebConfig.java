@@ -9,10 +9,10 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // Укажите маршруты для разрешения запросов
-                .allowedOrigins("http://localhost:5173") // Укажите домен вашего React приложения
-                .allowedMethods("GET", "POST", "PUT", "DELETE") // Разрешенные методы
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:5173")
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*") // Разрешенные заголовки
-                .allowCredentials(true); // Если нужно поддерживать cookie
+                .allowCredentials(true);
     }
 }

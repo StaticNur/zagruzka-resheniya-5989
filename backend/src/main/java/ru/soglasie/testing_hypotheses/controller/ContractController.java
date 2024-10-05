@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.soglasie.testing_hypotheses.model.entity.Contract;
-import ru.soglasie.testing_hypotheses.repository.ContractRepository;
+import ru.soglasie.testing_hypotheses.service.ContractService;
 
 import java.util.List;
 
@@ -13,49 +13,35 @@ import java.util.List;
 public class ContractController {
 
     @Autowired
-    private ContractRepository contractRepository;
+    private ContractService contractService;
 
     @GetMapping
     public List<Contract> getAllContracts() {
-        return contractRepository.findAll();
+        return contractService.getAllContracts();
     }
 
     @PostMapping
     public Contract createContract(@RequestBody Contract contract) {
-        return contractRepository.save(contract);
+        return contractService.createContract(contract);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Contract> getContractById(@PathVariable Long id) {
-        return contractRepository.findById(id)
+        return contractService.getContractById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Contract> updateContract(@PathVariable Long id, @RequestBody Contract contractDetails) {
-        return contractRepository.findById(id)
-                .map(contract -> {
-                    contract.setDateCreate(contractDetails.getDateCreate());
-                    contract.setDateBegin(contractDetails.getDateBegin());
-                    contract.setPremium(contractDetails.getPremium());
-                    contract.setAgent(contractDetails.getAgent());
-                    contract.setProduct(contractDetails.getProduct());
-                    contract.setCommission(contractDetails.getCommission());
-                    contract.setStatus(contractDetails.getStatus());
-                    return ResponseEntity.ok(contractRepository.save(contract));
-                })
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(contractService.updateContract(id, contractDetails));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteContract(@PathVariable Long id) {
-        return contractRepository.findById(id)
-                .map(contract -> {
-                    contractRepository.delete(contract);
-                    return ResponseEntity.ok().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        return contractService.deleteContract(id)
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.notFound().build();
     }
 }
 

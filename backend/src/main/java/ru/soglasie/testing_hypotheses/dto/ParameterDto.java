@@ -1,6 +1,5 @@
 package ru.soglasie.testing_hypotheses.dto;
 
-import jakarta.persistence.Column;
 import lombok.Data;
 import ru.soglasie.testing_hypotheses.model.entity.Parameter;
 
