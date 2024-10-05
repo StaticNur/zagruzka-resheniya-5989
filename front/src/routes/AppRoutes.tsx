@@ -4,6 +4,8 @@ import { LoginPage } from "../pages/LoginPage"
 import { HomePage } from "../pages/HomePage"
 import { PrivateRoute } from "./PrivateRoute"
 import { CreateProduct } from "../pages/CreateProduct"
+import { TotalAmountOfContract } from "../pages/TotalAmountOfContract"
+import { NewAgreement } from "../pages/NewAgreement"
 
 export function AppRoutes () {
   const isAuth = useAuthStore(state => state.isAuth)
@@ -25,6 +27,22 @@ export function AppRoutes () {
           element={
             <PrivateRoute allowedRoles="admin">
               <CreateProduct />
+            </PrivateRoute>
+          }
+        />
+        <Route 
+          path="/total-amount-of-contract"
+          element={
+            <PrivateRoute allowedRoles="admin">
+              <TotalAmountOfContract />
+            </PrivateRoute>
+          }
+        />
+        <Route 
+          path="/new-agreement"
+          element={
+            <PrivateRoute allowedRoles="admin">
+              <NewAgreement />
             </PrivateRoute>
           }
         />

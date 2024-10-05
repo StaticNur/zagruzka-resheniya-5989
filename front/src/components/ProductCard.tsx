@@ -1,10 +1,27 @@
 import { Add } from "@mui/icons-material";
+import { useNavigate } from 'react-router-dom';
 import { Box, List, ListItem, Typography, Button } from "@mui/material";
 import { Product } from "../types";
 
-export function ProductCard ({ id, category, name, description }: Product) {
+export function ProductCard({ id, name, description }: Product) {
+  const navigate = useNavigate(); // Используем useNavigate для навигации
+
+  const handleDuplicateClick = () => {
+    // Навигация на нужную страницу при клике
+    navigate('/total-amount-of-contract', { state: { title: name } });
+  };
+
+  async function clickHandler(productId) {
+    try {
+      await axios.post(`/api/products/${productId}`);
+    } catch (err) {
+      alert('An error occurred: ' + err.message); // Display the error message to the user
+    }
+  }
+
+
   return (
-    <Box sx={{
+    <Box onClick={handleDuplicateClick} sx={{
       display: 'flex',
       alignItems: 'flex-start',
       justifyContent: 'space-between',
@@ -15,7 +32,7 @@ export function ProductCard ({ id, category, name, description }: Product) {
     }}>
       <Box>
         <Typography fontSize={28} component="h4">
-          { id }. { name }
+          {id}. {name}
         </Typography>
         <List>
           <ListItem>
@@ -34,7 +51,12 @@ export function ProductCard ({ id, category, name, description }: Product) {
         maxWidth: '140px',
         fontSize: '14px',
         textTransform: 'inherit'
-      }} variant="contained" fullWidth >
+      }} variant="contained"
+        fullWidth
+        onClick={(e) => {
+          e.stopPropagation();
+          clickHandler(id);
+        }}>
         <Add />
         Дублировать
       </Button>

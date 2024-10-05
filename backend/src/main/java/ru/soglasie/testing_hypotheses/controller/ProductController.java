@@ -50,6 +50,14 @@ public class ProductController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/duplicate/{id}")
+    public ResponseEntity<ProductDto> createProductDuplicate(@PathVariable Long id) {
+        Product productDuplicate = productService.createProductDuplicate(id);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ProductDto(productDuplicate));
+    }
+
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         return ResponseEntity

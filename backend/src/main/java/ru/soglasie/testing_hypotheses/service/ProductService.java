@@ -51,6 +51,7 @@ public class ProductService {
 
     @Transactional
     public Product createProduct(Product product) {
+        product.setName(product.getName().trim());
         return productRepository.save(product);
     }
 
@@ -78,4 +79,22 @@ public class ProductService {
                 })
                 .orElse(false);
     }
+
+    public Product createProductDuplicate(Long id) {
+        return productRepository.findById(id)
+                .map(product -> {
+                    Product newProduct = new Product();
+
+                    newProduct.setDescription(product.getDescription());
+                    newProduct.setExplanationForManager(product.getExplanationForManager());
+                    newProduct.setCategory(product.getCategory());
+                    newProduct.setParameters(product.getParameters());
+
+                    newProduct.setName(product.getName() + " (Copy)");
+
+                    return productRepository.save(newProduct);
+                })
+                .orElseThrow(() -> new NotFoundException("Продукт с ID " + id + " не найден"));
+    }
+
 }

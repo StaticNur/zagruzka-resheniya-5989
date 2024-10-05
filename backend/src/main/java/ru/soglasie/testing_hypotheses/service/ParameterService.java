@@ -20,6 +20,7 @@ public class ParameterService {
 
     @Transactional
     public Parameter createParameter(Parameter parameter) {
+        parameter.setName(parameter.getName().trim());
         return parameterRepository.save(parameter);
     }
 
