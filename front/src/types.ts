@@ -3,9 +3,7 @@ export interface Product {
   name: string
   description: string
   explanationForManager: string
-  category: {
-    id: number
-  }
+  category: string
   parameters: {
     id: number
   }[]

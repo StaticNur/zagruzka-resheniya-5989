@@ -2,6 +2,7 @@ import { Add } from "@mui/icons-material";
 import { useNavigate } from 'react-router-dom';
 import { Box, List, ListItem, Typography, Button } from "@mui/material";
 import { Product } from "../types";
+import axios from "../axios"
 
 export function ProductCard({ id, name, description }: Product) {
   const navigate = useNavigate(); // Используем useNavigate для навигации
@@ -11,9 +12,11 @@ export function ProductCard({ id, name, description }: Product) {
     navigate('/total-amount-of-contract', { state: { title: name } });
   };
 
-  async function clickHandler(productId) {
+  async function clickHandler() {
+    event.stopPropagation(); 
+    window.location.reload();
     try {
-      await axios.post(`/api/products/${productId}`);
+      await axios.post(`/api/products/duplicate/${id}`);
     } catch (err) {
       alert('An error occurred: ' + err.message); // Display the error message to the user
     }
@@ -21,7 +24,7 @@ export function ProductCard({ id, name, description }: Product) {
 
 
   return (
-    <Box onClick={handleDuplicateClick} sx={{
+    <Box sx={{
       display: 'flex',
       alignItems: 'flex-start',
       justifyContent: 'space-between',
@@ -30,7 +33,7 @@ export function ProductCard({ id, name, description }: Product) {
       borderRadius: '12px',
       padding: '34px 22px'
     }}>
-      <Box>
+      <Box  onClick={handleDuplicateClick} >
         <Typography fontSize={28} component="h4">
           {id}. {name}
         </Typography>
@@ -53,10 +56,7 @@ export function ProductCard({ id, name, description }: Product) {
         textTransform: 'inherit'
       }} variant="contained"
         fullWidth
-        onClick={(e) => {
-          e.stopPropagation();
-          clickHandler(id);
-        }}>
+        onClick={clickHandler}>
         <Add />
         Дублировать
       </Button>
